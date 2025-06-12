@@ -2,10 +2,10 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, CallbackQueryHandler
 import time
 import random
-from dotenv import loadenv
+from dotenv import load_dotenv
 import os
 
-loadenv()
+load_dotenv()
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 CPA_LINKS = ["https://is.gd/Kr055K","https://is.gd/ArWCZo"]
