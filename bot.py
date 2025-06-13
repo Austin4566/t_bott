@@ -105,7 +105,6 @@ async def balance(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # Bot setup
 app = ApplicationBuilder().token(BOT_TOKEN).build()
 app.add_handler(CommandHandler("start", start))
-app.add_handler(CommandHandler("hello", hello))
 app.add_handler(CommandHandler("earn", earn))
 app.add_handler(CommandHandler("balance", balance))
 app.add_handler(CallbackQueryHandler(handle_callback))
