@@ -15,13 +15,38 @@ user_balances = {}
 WAIT_SECONDS = 150
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    first_name = update.effective_user.first_name
+
+    # Check for referral
+    if context.args:
+        try:
+            referrer_id = int(context.args[0])
+            if referrer_id != user_id and user_id not in referrals:
+                referrals[user_id] = referrer_id
+                referral_counts[referrer_id] = referral_counts.get(referrer_id, 0) + 1
+                user_balances[referrer_id] = user_balances.get(referrer_id, 0) + REFERRAL_REWARD
+                await update.message.reply_text(
+                    f"🎉 You were referred by user {referrer_id}. They just earned {REFERRAL_REWARD} coins!"
+                )
+        except ValueError:
+            await update.message.reply_text("❌ Invalid referral code.")
+
+    # Generate referral link
+    referral_link = f"https://t.me/{context.bot.username}?start={user_id}"
+
     await update.message.reply_text(
-        f"Welcome, {update.effective_user.first_name}. I am KoinKaster bot.\n\n"
-        f"Get paid for mining tasks 🎁\nClick /earn every 2 minutes to start earning now 🤑"
+        f"Welcome, {first_name}.\n\n"
+        f"Get paid for mining tasks 🎁\n"
+        f"Click /earn every 2 minutes to start earning now 🤑\n\n"
+        f"👥 Invite others and earn more:\nYour referral link:\n{referral_link}"
     )
 
-async def hello(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(f"Hello {update.effective_user.first_name}")
+
+async def referrals_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    count = referral_counts.get(user_id, 0)
+    await update.message.reply_text(f"👥 You have referred {count} user(s).")
 
 async def earn(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
@@ -84,5 +109,6 @@ app.add_handler(CommandHandler("hello", hello))
 app.add_handler(CommandHandler("earn", earn))
 app.add_handler(CommandHandler("balance", balance))
 app.add_handler(CallbackQueryHandler(handle_callback))
+app.add_handler(CommandHandler("referrals", referrals_command))
 
 app.run_polling()
